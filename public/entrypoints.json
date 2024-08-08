@@ -1,0 +1,24 @@
+{
+  "editor": {
+    "js": [
+      "js/runtime.c036bd.js",
+      "js/editor.896ca3.js"
+    ],
+    "css": [
+      "css/editor.37322c.css"
+    ],
+    "dependencies": [
+      "react",
+      "wp-i18n",
+      "wp-plugins",
+      "wp-edit-post",
+      "wp-block-editor",
+      "wp-data",
+      "wp-core-data",
+      "wp-components",
+      "wp-editor",
+      "wp-notices",
+      "wp-blocks"
+    ]
+  }
+}

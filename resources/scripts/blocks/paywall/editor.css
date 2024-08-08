@@ -1,0 +1,16 @@
+[data-type='wp-paywall/paywall'] {
+  background-color: rgba(0 0 0 / 1.5%);
+}
+
+[data-type='wp-paywall/paywall']::before {
+  position: absolute;
+  display: block;
+  content: '';
+  inset: 0;
+  mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAyMCI+PHJlY3QgeD0iMCIgZmlsbD0ibm9uZSIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIi8+PGc+PHBhdGggZD0iTTEwIDkuNmMtLjYgMC0xIC40LTEgMSAwIC40LjMuNy42LjhsLS4zIDEuNGgxLjNsLS4zLTEuNGMuNC0uMS42LS40LjYtLjguMS0uNi0uMy0xLS45LTF6bS4xLTQuM2MtLjcgMC0xLjQuNS0xLjQgMS4yVjhoMi43VjYuNWMtLjEtLjctLjYtMS4yLTEuMy0xLjJ6TTEwIDJMMyA1djNjLjEgNC40IDIuOSA4LjMgNyA5LjkgNC4xLTEuNiA2LjktNS41IDctOS45VjVsLTctM3ptNCAxMWMwIC42LS40IDEtMSAxSDdjLS42IDAtMS0uNC0xLTFWOWMwLS42LjQtMSAxLTFoLjNWNi41QzcuNCA1LjEgOC42IDQgMTAgNGMxLjQgMCAyLjYgMS4xIDIuNyAyLjVWOGguM2MuNiAwIDEgLjQgMSAxdjR6Ii8+PC9nPjwvc3ZnPg==');
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
+  background-color: currentcolor;
+  opacity: 0.05;
+}

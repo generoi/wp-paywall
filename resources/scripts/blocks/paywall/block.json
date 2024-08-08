@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "wp-paywall/paywall",
+  "title": "Paywalled Content",
+  "description": "Content within this block will be behind the paywall if it's enabled.",
+  "icon": "privacy",
+  "category": "theme",
+  "usesContext": ["postId", "postType"],
+  "supports": {
+    "multiple": false,
+    "html": false,
+    "align": ["wide", "full"]
+  }
+}

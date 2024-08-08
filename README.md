@@ -1,25 +1,6 @@
-# wp-plugin-boilerplate
+# wp-paywall
 
-> A boilerplate WordPress plugin
-
-## Requirements
-
-_Does the plugin have any requirements?_
-
-## Features
-
-_A list of features_.
-
-## API
-
-_Any hooks exposed?_
-
-```php
-// Load recaptcha script.
-add_filter('gravityforms-timber/options', function ($options) {
-  $options['recaptcha'] = true;
-});
-```
+> A paywall plugin
 
 ## Development
 
@@ -42,5 +23,5 @@ Build assets
 
 ## Translations
 
-    wp i18n make-pot . languages/wp-plugin-boilerplate.pot
+    wp i18n make-pot . languages/wp-paywall.pot
     wp i18n make-mo languages/

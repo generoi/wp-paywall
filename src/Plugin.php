@@ -1,56 +1,88 @@
 <?php
 
-namespace GeneroWP\PluginBoilerplate;
+namespace GeneroWP\Paywall;
 
 class Plugin
 {
-    public $name = 'wp-plugin-boilerplate';
+    public $name = 'wp-paywall';
+
     public $file;
+
     public $path;
+
     public $url;
 
     protected static $instance;
 
     public static function getInstance()
     {
-        if (!isset(self::$instance)) {
-            self::$instance = new static();
+        if (! isset(self::$instance)) {
+            self::$instance = new static;
         }
+
         return self::$instance;
     }
 
     public function __construct()
     {
-        $this->file = realpath(__DIR__ . '/../wp-plugin-boilerplate.php');
+        $this->file = realpath(__DIR__.'/../wp-paywall.php');
         $this->path = untrailingslashit(plugin_dir_path($this->file));
         $this->url = untrailingslashit(plugin_dir_url($this->file));
 
-        add_action('init', [$this, 'loadTextdomain']);
-        add_action('wp_enqueue_scripts', [$this, 'registerAssets']);
-        add_action('wp_enqueue_scripts', [$this, 'enqueueAssets']);
+        add_action('plugins_loaded', [$this, 'init']);
+        add_action('init', [$this, 'registerBlockTypes']);
+        add_action('init', [$this, 'registerMeta']);
+        add_action('enqueue_block_editor_assets', [$this, 'blockEditorAssets'], 0);
     }
 
-    public function registerAssets(): void
+    public function init()
     {
-        wp_register_script(
-            "{$this->name}/js",
-            "{$this->url}/dist/main.js",
-            [],
-            filemtime($this->path . '/dist/main.js')
-        );
-
-        wp_register_style(
-            "{$this->name}/css",
-            "{$this->url}/dist/main.css",
-            [],
-            filemtime($this->path . '/dist/main.css')
-        );
+        new Paywall($this);
+        new Admin\TermAdmin;
+        new Admin\PostAdmin;
     }
 
-    public function enqueueAssets(): void
+    public function registerMeta(): void
     {
-        wp_enqueue_style("{$this->name}/css");
-        wp_enqueue_script("{$this->name}/js");
+        foreach (['page', 'post'] as $postType) {
+            register_post_meta($postType, Paywall::META_PAYWALL, [
+                'show_in_rest' => true,
+                'single' => true,
+                'type' => 'string',
+                'sanitize_callback' => 'sanitize_key',
+            ]);
+        }
+    }
+
+    public function registerBlockTypes(): void
+    {
+        include dirname(__DIR__).'/resources/scripts/blocks/paywall/paywall-block.php';
+    }
+
+    public function blockEditorAssets(): void
+    {
+        $publicDir = dirname(__DIR__).'/public/';
+        $manifest = json_decode(file_get_contents($publicDir.'manifest.json'));
+        $entrypoints = json_decode(file_get_contents($publicDir.'entrypoints.json'));
+
+        $runtime = file_get_contents($publicDir.$manifest->{'runtime.js'});
+
+        wp_enqueue_style(
+            'wp-paywall/editor.css',
+            $this->url.'/public/'.$manifest->{'editor.css'},
+            [],
+            null,
+        );
+        wp_enqueue_script(
+            'wp-paywall/editor.js',
+            $this->url.'/public/'.$manifest->{'editor.js'},
+            $entrypoints->editor->dependencies,
+            null,
+        );
+        wp_add_inline_script(
+            'wp-paywall/editor.js',
+            $runtime,
+        );
     }
 
     public function loadTextdomain(): void
@@ -58,8 +90,17 @@ class Plugin
         load_plugin_textdomain(
             $this->name,
             false,
-            dirname(plugin_basename($this->file)) . '/languages'
+            dirname(plugin_basename($this->file)).'/languages'
         );
     }
 
+    public function render(string $view, array $args = []): string
+    {
+        ob_start();
+        if (! get_template_part("wp-paywall/$view.php", null, $args)) {
+            load_template(dirname(__DIR__)."/views/$view.php", true, $args);
+        }
+
+        return ob_get_clean();
+    }
 }
