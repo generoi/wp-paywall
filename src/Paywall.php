@@ -95,7 +95,9 @@ class Paywall
         if (! self::isApplied()) {
             return;
         }
+        header('Vary: X-Paywall-Access');
         header('X-Robots-Tag: noarchive');
+        header(sprintf('X-Paywall-Access: %s', self::hasAccess() ? 1 : 0));
     }
 
     public function filterContent(string $content): string

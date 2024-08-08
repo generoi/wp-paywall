@@ -2,6 +2,20 @@
 
 > A paywall plugin
 
+By default article content is behind the paywall but can be manually _opted-out_ on a per-post setting. Pages are public but like article they can be _opted-in_ manually.
+
+If a page/post has manually configured a setting it will take precedence over everything else but categories can also set a default state for all content tagged with the category. This rule is inherited so if you tag a child-term it traverse ancestors until a preference is found. If nothing is found it defaults to the post-type rules where `post` is paywalled and `page` is not.
+
+Out of the box paywalled content will show the login form but you can override this template in your theme.
+
+Additionally there is a _Paywalled content_ block which can be used to manually tailor which section of a page is behind the paywall while everything outside of it will be public. _Note that using this block does NOT mark a page as paywalled, it only adjusts the content IF paywalled._
+
+There's a integration with Yoast to output rich schema data according to [Google's specifications](https://developers.google.com/search/docs/appearance/structured-data/paywalled-content). There's also a `X-Robots-Tag: noarchive` HTTP header sent.
+
+To cache allow proxy caches to differentiate paywelled content there's a `Vary: X-Paywall-Accepted` header and a `X-Paywall-Access: 0|1` added to the response.
+
+_TODO: Allow reverse proxies to handle the authentication._
+
 ## Development
 
 Install dependencies
