@@ -12,7 +12,7 @@ Additionally there is a _Paywalled content_ block which can be used to manually 
 
 There's a integration with Yoast to output rich schema data according to [Google's specifications](https://developers.google.com/search/docs/appearance/structured-data/paywalled-content). There's also a `X-Robots-Tag: noarchive` HTTP header sent.
 
-To cache allow proxy caches to differentiate paywelled content there's a `Vary: X-Paywall-Accepted` header and a `X-Paywall-Access: 0|1` added to the response.
+To allow reverse proxies to differentiate paywelled content there's a `Vary: X-Paywall-Accepted` header and a `X-Paywall-Access: 0|1` added to the response. For now this is also where bot whitelisting would happen for now.
 
 _TODO: Allow reverse proxies to handle the authentication._
 
