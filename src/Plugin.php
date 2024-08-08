@@ -98,7 +98,7 @@ class Plugin
     {
         ob_start();
         if (! get_template_part("wp-paywall/$view.php", null, $args)) {
-            load_template(dirname(__DIR__)."/views/$view.php", true, $args);
+            load_template(dirname(__DIR__)."/views/$view.php", false, $args);
         }
 
         return ob_get_clean();
