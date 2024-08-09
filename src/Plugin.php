@@ -2,6 +2,8 @@
 
 namespace GeneroWP\Paywall;
 
+use stdClass;
+
 class Plugin
 {
     public $name = 'wp-paywall';
@@ -32,6 +34,7 @@ class Plugin
         add_action('plugins_loaded', [$this, 'init']);
         add_action('init', [$this, 'registerBlockTypes']);
         add_action('init', [$this, 'registerMeta']);
+        add_action('init', [$this, 'registerAssets']);
         add_action('enqueue_block_editor_assets', [$this, 'blockEditorAssets'], 0);
     }
 
@@ -59,24 +62,29 @@ class Plugin
         include dirname(__DIR__).'/resources/scripts/blocks/paywall/paywall-block.php';
     }
 
+    public function registerAssets(): void
+    {
+        wp_register_style(
+            'wp-paywall/admin.css',
+            $this->asset($this->bundle('admin')->css[0])->url,
+        );
+    }
+
     public function blockEditorAssets(): void
     {
-        $publicDir = dirname(__DIR__).'/public/';
-        $manifest = json_decode(file_get_contents($publicDir.'manifest.json'));
-        $entrypoints = json_decode(file_get_contents($publicDir.'entrypoints.json'));
-
-        $runtime = file_get_contents($publicDir.$manifest->{'runtime.js'});
+        $editorBundle = $this->bundle('editor');
+        $runtime = file_get_contents($this->asset($editorBundle->js[0])->path);
 
         wp_enqueue_style(
             'wp-paywall/editor.css',
-            $this->url.'/public/'.$manifest->{'editor.css'},
+            $this->asset($editorBundle->css[0])->url,
             [],
             null,
         );
         wp_enqueue_script(
             'wp-paywall/editor.js',
-            $this->url.'/public/'.$manifest->{'editor.js'},
-            $entrypoints->editor->dependencies,
+            $this->asset($editorBundle->js[1])->url,
+            $editorBundle->dependencies,
             null,
         );
         wp_add_inline_script(
@@ -102,5 +110,24 @@ class Plugin
         }
 
         return ob_get_clean();
+    }
+
+    protected function bundle(string $bundle): stdClass
+    {
+        $publicDir = dirname(__DIR__).'/public/';
+        static $entrypoints = null;
+        if (! $entrypoints) {
+            $entrypoints = json_decode(file_get_contents($publicDir.'entrypoints.json'));
+        }
+
+        return $entrypoints->{$bundle};
+    }
+
+    protected function asset(string $asset): stdClass
+    {
+        return (object) [
+            'url' => $this->url.'/public/'.$asset,
+            'path' => dirname(__DIR__).'/public/'.$asset,
+        ];
     }
 }

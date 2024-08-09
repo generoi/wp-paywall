@@ -4,13 +4,15 @@
 export default async (app) => {
   app
     .entry('editor', ['@scripts/editor.jsx'])
+    .entry('admin', ['@styles/admin'])
     .setPath({
       '@dist': `public`,
       '@scripts': `@src/scripts`,
       '@src': `resources`,
       '@styles': `@src/styles`,
-    })
-    .hash();
+    });
+
+  app.when(app.isProduction, app.hash);
   app.build.items.precss.setLoader('minicss');
   app.hooks.action('build.before', (bud) => {
     bud.extensions

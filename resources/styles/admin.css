@@ -1,0 +1,12 @@
+#wp-admin-bar-paywall .dashicon {
+  /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
+  font-family: dashicons !important;
+
+  &.is-applied {
+    color: #04ff14;
+  }
+
+  &:not(.is-applied) {
+    opacity: 0.5;
+  }
+}
