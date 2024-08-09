@@ -8,7 +8,7 @@ class PaywallAccessTest extends WP_UnitTestCase
     {
         $postId = $this->factory()->post->create([
             'post_type' => 'post',
-            'post_status' => 'public',
+            'post_status' => 'publish',
             'post_content' => 'Paywalled post',
         ]);
 
