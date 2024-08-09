@@ -20,7 +20,7 @@ class Paywall
     public function __construct(protected Plugin $plugin)
     {
         add_filter('wpseo_schema_webpage', [$this, 'setPaywalledCreativeWork'], 10, 2);
-        add_action('send_headers', [$this, 'sendHeaders']);
+        add_action('wp_headers', [$this, 'addHeaders'], 100);
         add_filter('the_content', [$this, 'filterContent'], PHP_INT_MAX);
     }
 
@@ -90,14 +90,16 @@ class Paywall
         return $data;
     }
 
-    public function sendHeaders(): void
+    public function addHeaders(array $headers): array
     {
         if (! self::isApplied()) {
-            return;
+            return $headers;
         }
-        header('Vary: X-Paywall-Access');
-        header('X-Robots-Tag: noarchive');
-        header(sprintf('X-Paywall-Access: %s', self::hasAccess() ? 1 : 0));
+        $headers['Vary'] = 'X-Paywall-Access';
+        $headers['X-Robots-Tag'] = 'noarchive';
+        $headers['X-Paywall-Access'] = self::hasAccess() ? 1 : 0;
+
+        return $headers;
     }
 
     public function filterContent(string $content): string
