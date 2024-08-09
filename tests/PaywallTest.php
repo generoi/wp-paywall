@@ -8,7 +8,7 @@ class PaywallTest extends WP_UnitTestCase
     {
         $postId = $this->factory()->post->create([
             'post_type' => 'post',
-            'post_status' => 'public',
+            'post_status' => 'publish',
             'post_content' => 'Paywalled post',
         ]);
 
@@ -25,7 +25,7 @@ class PaywallTest extends WP_UnitTestCase
     {
         $postId = $this->factory()->post->create([
             'post_type' => 'page',
-            'post_status' => 'public',
+            'post_status' => 'publish',
             'post_content' => 'Paywalled post',
         ]);
         $this->assertFalse(Paywall::isApplied($postId), 'By default pages are public.');
@@ -41,7 +41,7 @@ class PaywallTest extends WP_UnitTestCase
     {
         $postId = $this->factory()->post->create([
             'post_type' => 'post',
-            'post_status' => 'public',
+            'post_status' => 'publish',
             'post_content' => 'Paywalled post',
         ]);
 
@@ -60,7 +60,7 @@ class PaywallTest extends WP_UnitTestCase
     {
         $postId = $this->factory()->post->create([
             'post_type' => 'post',
-            'post_status' => 'public',
+            'post_status' => 'publish',
             'post_content' => 'Paywalled post',
         ]);
 
