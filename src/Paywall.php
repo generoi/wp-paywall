@@ -2,6 +2,8 @@
 
 namespace GeneroWP\Paywall;
 
+use GeneroWP\Paywall\AccessRules\Crawlers;
+use GeneroWP\Paywall\AccessRules\LoggedInUsers;
 use WP_Post;
 use Yoast\WP\SEO\Context\Meta_Tags_Context;
 
@@ -34,18 +36,32 @@ class Paywall
 
     public static function hasAccess(WP_Post|int|null $postId = null): bool
     {
-        if (is_user_logged_in()) {
-            return true;
+        $postId = $postId instanceof WP_Post ? $postId->ID : $postId;
+        $hasPreAccess = apply_filters('wp-paywall/has-access', null, $postId);
+        if ($hasPreAccess !== null) {
+            return $hasPreAccess;
         }
 
-        return false;
+        $accessRules = apply_filters('wp-paywall/access-rules', [
+            Crawlers::class,
+            LoggedInUsers::class,
+        ]);
+
+        return array_reduce(
+            $accessRules,
+            fn (bool $isAllowed, string $rule) => (new $rule)->isAllowed($isAllowed, $postId),
+            false
+        );
     }
 
     public static function isApplied(WP_Post|int|null $postId = null): bool
     {
-        if ($postId instanceof WP_Post) {
-            $postId = $postId->ID;
+        $postId = $postId instanceof WP_Post ? $postId->ID : $postId;
+        $isPreApplied = apply_filters('wp-paywall/is-applied', null, $postId);
+        if ($isPreApplied !== null) {
+            return $isPreApplied;
         }
+
         if (! $postId) {
             if (! is_singular()) {
                 return false;
