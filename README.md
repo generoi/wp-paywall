@@ -14,7 +14,36 @@ There's a integration with Yoast to output rich schema data according to [Google
 
 To allow reverse proxies to differentiate paywelled content there's a `Vary: X-Paywall-Accepted` header and a `X-Paywall-Access: 0|1` added to the response. For now this is also where bot whitelisting would happen for now.
 
-_TODO: Allow reverse proxies to handle the authentication._
+## Hooks
+
+```php
+/**
+ * Hook in early to return a header passed on from a reverse proxy.
+ */
+add_filter('wp-paywall/has-access', function (?bool $hasAccess, ?int $postId) {
+    $proxyAuth = $_SERVER['X-Proxy-Valid-Auth'] ?? null;
+    return $proxyAuth === '1';
+}, 10, 2);
+
+/**
+ * Remove default access rules and set your own.
+ */
+add_filter('wp-paywall/access-rules', function (array $rules, ?int $postId) {
+    $rules = [];
+    $rules[] = CustomAccess::class;
+    return $rules;
+}, 10, 2);
+
+/**
+ * Hook in early to return if paywall is applied or not.
+ */
+add_filter('wp-paywall/is-applied', function (?bool $isApplied = null, ?int $postId) {
+    if ($postId === 1234) {
+        return true;
+    }
+    return $isApplied;
+}, 10, 2);
+```
 
 ## Development
 
