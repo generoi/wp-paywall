@@ -20,5 +20,14 @@
       "wp-notices",
       "wp-blocks"
     ]
+  },
+  "admin": {
+    "js": [
+      "js/runtime.c036bd.js"
+    ],
+    "css": [
+      "css/admin.439e98.css"
+    ],
+    "dependencies": []
   }
 }

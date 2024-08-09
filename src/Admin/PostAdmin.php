@@ -9,6 +9,8 @@ class PostAdmin
     public function __construct()
     {
         add_action('admin_bar_menu', [$this, 'addAdminBarNode'], 100);
+        add_action('wp_enqueue_scripts', [$this, 'enqueueAssets']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueueAssets']);
 
         foreach (['post', 'page'] as $postType) {
             add_filter(sprintf('manage_edit-%s_columns', $postType), [$this, 'addColumn']);
@@ -32,7 +34,11 @@ class PostAdmin
         $wp_admin_bar->add_node([
             'id' => 'paywall',
             'parent' => 'top-secondary',
-            'title' => $isApplied ? esc_attr__('Paywalled') : esc_attr__('No Paywall'),
+            'title' => sprintf(
+                '<span class="dashicon dashicons dashicons-privacy %s"></span> <small>%s</small>',
+                $isApplied ? 'is-applied' : '',
+                $isApplied ? __('Paywalled') : __('Not paywalled')
+            ),
         ]);
 
     }
@@ -50,5 +56,14 @@ class PostAdmin
             case Paywall::META_PAYWALL:
                 echo Paywall::isApplied($postId) ? esc_html__('Yes') : '';
         }
+    }
+
+    public function enqueueAssets(): void
+    {
+        if (! is_admin_bar_showing()) {
+            return;
+        }
+
+        wp_enqueue_style('wp-paywall/admin.css');
     }
 }
