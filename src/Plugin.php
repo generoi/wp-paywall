@@ -104,11 +104,16 @@ class Plugin
 
     public function render(string $view, array $args = []): string
     {
-        ob_start();
-        if (! get_template_part("wp-paywall/$view.php", null, $args)) {
-            load_template(dirname(__DIR__)."/views/$view.php", false, $args);
+        $template = locate_template("wp-paywall/{$view}.php");
+        if (! $template) {
+            $template = dirname(__DIR__)."/views/{$view}.php";
         }
+        $template = apply_filters('wp-paywall/template', $template, $args);
 
+        ob_start();
+        if ($template) {
+            load_template($template, false, $args);
+        }
         return ob_get_clean();
     }
 
