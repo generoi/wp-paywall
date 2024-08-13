@@ -2,8 +2,10 @@
 
 namespace GeneroWP\Paywall;
 
+use Firebase\JWT\JWT;
 use GeneroWP\Paywall\AccessRules\Crawlers;
 use GeneroWP\Paywall\AccessRules\LoggedInUsers;
+use GeneroWP\Paywall\AccessRules\ProxyHeader;
 use WP_Post;
 use Yoast\WP\SEO\Context\Meta_Tags_Context;
 
@@ -19,11 +21,18 @@ class Paywall
 
     public const OPTOUT_VALUE = 'optout';
 
+    public const AUTH_COOKIE = 'wp_paywall_auth';
+
     public function __construct(protected Plugin $plugin)
     {
         add_filter('wpseo_schema_webpage', [$this, 'setPaywalledCreativeWork'], 10, 2);
         add_action('wp_headers', [$this, 'addHeaders'], 100);
         add_filter('the_content', [$this, 'filterContent'], PHP_INT_MAX);
+
+        if ($this->privateKeyPath()) {
+            add_action('set_logged_in_cookie', [$this, 'onLogin'], 10, 4);
+            add_action('clear_auth_cookie', [$this, 'onLogout']);
+        }
     }
 
     public static function options(): array
@@ -45,6 +54,7 @@ class Paywall
         $accessRules = apply_filters('wp-paywall/access-rules', [
             Crawlers::class,
             LoggedInUsers::class,
+            // ProxyHeader::class,
         ]);
 
         return array_reduce(
@@ -132,5 +142,41 @@ class Paywall
         }
 
         return $this->plugin->render('protected', ['content' => $content]);
+    }
+
+    protected function privateKeyPath(): ?string
+    {
+        return getenv('PAYWALL_JWT_PRIVATE_KEY') ?: null;
+    }
+
+    public function onLogin(string $cookie, int $expire, int $expiration, int $userId): void
+    {
+        $key = file_get_contents($this->privateKeyPath());
+        $issuedAt = time();
+        $payload = JWT::encode([
+            'iss' => get_bloginfo('url'),
+            'iat' => $issuedAt,
+            'nbf' => $issuedAt,
+            'exp' => $expiration,
+            'edit_posts' => user_can($userId, 'edit_posts'),
+        ], $key, 'RS256');
+
+        setcookie(self::AUTH_COOKIE, $payload, [
+            'expires' => $expire,
+            'secure' => true,
+            'path' => COOKIEPATH ? COOKIEPATH : '/',
+            'domain' => COOKIE_DOMAIN,
+        ]);
+    }
+
+    public function onLogout(): void
+    {
+        setcookie(self::AUTH_COOKIE, 0, [
+            'expires' => time() - YEAR_IN_SECONDS,
+            'secure' => true,
+            'path' => COOKIEPATH ? COOKIEPATH : '/',
+            'domain' => COOKIE_DOMAIN,
+        ]);
+        unset($_COOKIE[self::AUTH_COOKIE]);
     }
 }
