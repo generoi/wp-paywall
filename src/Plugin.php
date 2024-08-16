@@ -114,6 +114,7 @@ class Plugin
         if ($template) {
             load_template($template, false, $args);
         }
+
         return ob_get_clean();
     }
 
