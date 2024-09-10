@@ -5,7 +5,6 @@ namespace GeneroWP\Paywall;
 use Firebase\JWT\JWT;
 use GeneroWP\Paywall\AccessRules\Crawlers;
 use GeneroWP\Paywall\AccessRules\LoggedInUsers;
-use GeneroWP\Paywall\AccessRules\ProxyHeader;
 use WP_Post;
 use Yoast\WP\SEO\Context\Meta_Tags_Context;
 
@@ -157,6 +156,7 @@ class Paywall
         if (defined('WP_PAYWALL_JWT_ENABLED') && ! WP_PAYWALL_JWT_ENABLED) {
             return false;
         }
+
         return true;
     }
 
