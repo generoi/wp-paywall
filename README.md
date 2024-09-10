@@ -14,6 +14,14 @@ There's a integration with Yoast to output rich schema data according to [Google
 
 To allow reverse proxies to differentiate paywelled content there's a `Vary: X-Paywall-Accepted` header and a `X-Paywall-Access: 0|1` added to the response. For now this is also where bot whitelisting would happen for now.
 
+## Environment variables
+
+- `PAYWALL_JWT_PRIVATE_KEY` should be set to the absolute of path of a private key used to sign JWT payloads.
+
+## Constants
+
+- `WP_PAYWALL_JWT_ENABLED` can be set to `false` to disable adding the JWT auth cookie, for example if you need it regardless if the plugin is enabled or not. Defaults to enabled `true` _if_ there is a `PAYWALL_JWT_PRIVATE_KEY` environment variable set.
+
 ## Hooks
 
 ```php

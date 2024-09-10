@@ -29,7 +29,7 @@ class Paywall
         add_action('wp_headers', [$this, 'addHeaders'], 100);
         add_filter('the_content', [$this, 'filterContent'], PHP_INT_MAX);
 
-        if ($this->privateKeyPath()) {
+        if ($this->isJwtCookieEnabled()) {
             add_action('set_logged_in_cookie', [$this, 'onLogin'], 10, 4);
             add_action('clear_auth_cookie', [$this, 'onLogout']);
         }
@@ -147,6 +147,17 @@ class Paywall
     protected function privateKeyPath(): ?string
     {
         return getenv('PAYWALL_JWT_PRIVATE_KEY') ?: null;
+    }
+
+    protected function isJwtCookieEnabled(): bool
+    {
+        if (! $this->privateKeyPath()) {
+            return false;
+        }
+        if (defined('WP_PAYWALL_JWT_ENABLED') && ! WP_PAYWALL_JWT_ENABLED) {
+            return false;
+        }
+        return true;
     }
 
     public function onLogin(string $cookie, int $expire, int $expiration, int $userId): void
