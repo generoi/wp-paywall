@@ -16,6 +16,8 @@ class Plugin
 
     protected static $instance;
 
+    public Paywall $paywall;
+
     public static function getInstance()
     {
         if (! isset(self::$instance)) {
@@ -40,7 +42,7 @@ class Plugin
 
     public function init()
     {
-        new Paywall($this);
+        $this->paywall = new Paywall($this);
         new Admin\TermAdmin;
         new Admin\PostAdmin;
     }
