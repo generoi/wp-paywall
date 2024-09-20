@@ -18,7 +18,7 @@ class Plugin
 
     public Paywall $paywall;
 
-    public static function getInstance()
+    public static function getInstance(): static
     {
         if (! isset(self::$instance)) {
             self::$instance = new static;
